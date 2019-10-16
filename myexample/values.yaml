@@ -1,0 +1,93 @@
+# Default values for myexample.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+global:
+  image:
+    tag: develop
+    pullPolicy: Always
+
+  imagePullSecrets: []
+  service:
+    type: ClusterIP
+    port: 80
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: myexample.kube.ilab.team
+      paths:
+        - path: /
+          serviceName: front
+    - host: myexample-api.kube.ilab.team
+      paths:
+        - path: /
+          serviceName: api
+  tls:
+   - secretName: myexample.kube.ilab.team-tls
+     hosts:
+       - myexample.kube.ilab.team
+   - secretName: myexample-api.kube.ilab.team-tls
+     hosts:
+       - myexample-api.kube.ilab.team
+
+
+
+front:
+  replicaCount: 1
+
+  image:
+    repository: tutum/hello-world
+    tag: latest
+
+  imagePullSecrets: []
+  nameOverride: "front"
+  fullnameOverride: "front"
+
+  service:
+    port: 80
+
+  resources:
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+
+api:
+  replicaCount: 1
+
+  image:
+    repository: tutum/hello-world
+    # repository: eu.gcr.io/ilab-155921/myexample-front
+    tag: latest
+
+  imagePullSecrets: []
+  nameOverride: "api"
+  fullnameOverride: "api"
+
+  service:
+    port: 80
+
+  resources:
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
